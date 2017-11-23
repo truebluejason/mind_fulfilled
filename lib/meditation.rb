@@ -1,11 +1,10 @@
 require 'yaml'
 require 'base_screen.rb'
+require 'log.rb'
 require 'constants.rb'
 include Constants
 
 class Meditation < BaseScreen
-
-	attr_reader :duration, :distractions, :distract_counts, :loaded_data
 
 	def initialize
 		userdata = File.join(DATA_PATH,"userdata.yml")
@@ -15,6 +14,7 @@ class Meditation < BaseScreen
 	def start!
 		setup
 		meditate
+		reflect
 		save_data
 	end
 
@@ -28,7 +28,7 @@ class Meditation < BaseScreen
 			pretty_puts 'Desired Length of Meditation (minutes): '
 			blank
 			action = get_action.to_i
-			blank Constants::SCREEN_GAP
+			blank SCREEN_GAP
 			if action > 0
 				@duration = action
 				proceed = true
@@ -38,17 +38,19 @@ class Meditation < BaseScreen
 		end
 		proceed = false
 
+		bindings = @loaded_data['options']['binding']
 		until proceed do
 			blank 2
 			line
-			pretty_puts 'Instructions'
+			title_puts 'Instructions'
+			blank
 			pretty_puts '1. Type "Y" to start the meditation session.'
 			pretty_puts '2. Once the session begins and you notice that you have been distracted,'
-			pretty_puts '1. Type "1" to indicate that you have been distracted by a bodily sensation.', true
-			pretty_puts '2. Type "2" to indicate that you have been distracted by an emotion.', true
-			pretty_puts '3. Type "3" to indicate that you have been distracted by a thought.', true
-			pretty_puts '4. Type "4" to indicate that you have been distracted by a thought about thinking.', true
-			pretty_puts '5. Type "5" to indicate that you have been distracted by a strong desire.', true
+			pretty_puts "1. Type \"1\" to indicate that you have been distracted by #{bindings[0]}.", true
+			pretty_puts "2. Type \"2\" to indicate that you have been distracted by #{bindings[1]}.", true
+			pretty_puts "3. Type \"3\" to indicate that you have been distracted by #{bindings[2]}.", true
+			pretty_puts "4. Type \"4\" to indicate that you have been distracted by #{bindings[3]}.", true
+			pretty_puts "5. Type \"5\" to indicate that you have been distracted by #{bindings[4]}.", true
 			pretty_puts '6. Type "Quit" to quit the session any time. All stats will be saved.', true
 			pretty_puts "3. When the session ends, there will be an 
 						optional note that can be used to  record the meditation session's details."
@@ -83,7 +85,7 @@ class Meditation < BaseScreen
 			invalid_flag = false
 
 			# Until curr_time = start_time + duration, loop
-			until min_delta >= duration do
+			until min_delta >= @duration do
 				# update the screen
 				blank SCREEN_GAP
 				line
@@ -151,10 +153,42 @@ class Meditation < BaseScreen
 		timer.join
 	end
 
+	def reflect
+		# Acquire reflection notes from the user
+		line
+		title_puts "Optional Reflection Notes"
+		line
+		blank 17
+		pretty_puts 'Describe in detail the most prominent distraction for this session.'
+		pretty_puts 'Type the enter key to skip this question.'
+		blank
+		@q1 = get_action
+
+		line
+		title_puts "Optional Reflection Notes"
+		line
+		blank 17
+		pretty_puts 'Describe your mind\'s predominant reaction upon being distracted.'
+		pretty_puts 'Type the enter key to skip this question.'
+		blank
+		@q2 = get_action
+
+		line
+		title_puts "Optional Reflection Notes"
+		line
+		blank 17
+		pretty_puts 'Describe any other relevant details you\'d like to note.'
+		pretty_puts 'Type the enter key to skip this question.'
+		blank
+		@q3 = get_action
+
+		blank SCREEN_GAP
+	end
+
 	def save_data
 		# If doesn't exist, add title / count for a source of distraction to a hash
 		stats_hash = @loaded_data['data']['contents']
-		for i in @distract_counts do
+		for i in 0...@distract_counts.length do
 			key = @distractions[i]
 			if stats_hash.has_key? key
 				stats_hash[key] += @distract_counts[i]
@@ -170,9 +204,12 @@ class Meditation < BaseScreen
 		if today - last_used_date < 60*60*24*2 && today >= streak_refresh
 			@loaded_data['streak'] += 1
 			@loaded_data['data']['streak_refresh'] += 60*60*24
-			@loaded_data['last_used'] = today
+			@loaded_data['data']['last_used'] = today
 		end
 		last_used_date = today
+		# Create a Log item based on the session's details and convert the hash generated to YAML
+		log = Log.new(@duration, @distractions, @distract_counts, @q1, @q2, @q3)
+		@loaded_data['data']['session_info'] << log.to_hash
 		# Convert hash to YAML and write the file
 		File.open(File.join(DATA_PATH,"userdata.yml"), 'w') do |f|
 			f.puts @loaded_data.to_yaml

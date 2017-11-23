@@ -1,6 +1,8 @@
 require 'yaml'
 require 'base_screen.rb'
 require 'meditation.rb'
+require 'stats.rb'
+require 'options.rb'
 require 'constants.rb'
 include Constants
 
@@ -25,16 +27,10 @@ class Menu < BaseScreen
 									]
 				},
 				'data'			=> {
-					'contents'	=> {
-						
-					},
-					'notes' 	=> {
-						'q1'	=> "",
-						'q2'	=> "",
-						'q3'	=> ""
-					},
 					'last_used' 	=> Time.local(Time.now.year, Time.now.month, Time.now.day),
-					'streak_refresh'=> Time.local(Time.now.year, Time.now.month, Time.now.day)
+					'streak_refresh'=> Time.local(Time.now.year, Time.now.month, Time.now.day),
+					'contents'		=> {},
+					'session_info' 	=> []
 				}
 			}
 			File.open(File.join(DATA_PATH,"userdata.yml"), 'w') do |f|
@@ -95,8 +91,15 @@ class Menu < BaseScreen
 			when "begin"
 				session = Meditation.new
 				session.start!
+				blank SCREEN_GAP
 			when "stats"
+				stats = Stats.new
+				stats.start!
+				blank SCREEN_GAP
 			when "options"
+				options = Options.new
+				options.start!
+				blank SCREEN_GAP
 			when "quit"
 				quit = true
 			else
