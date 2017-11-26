@@ -18,7 +18,7 @@ class Menu < BaseScreen
 				'streak'	 	=> 0,
 				'options' 		=> {
 					'dm'		=> "Stay Mindful",
-					'simple'	=> "off",
+					'simple'	=> 'false',
 					'binding'	=> ["a bodily sensation",
 									"an emotion",
 									"a thought",

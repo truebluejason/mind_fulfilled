@@ -59,4 +59,18 @@ class BaseScreen
 		pretty_puts "That is not a valid input! Please try again."
 		line
 	end
+
+	def return_to_prev_page
+		blank 3
+		pretty_puts 'Type "Back" to return to the main menu.'
+		blank
+		quit = false
+		until quit do
+			if get_action == "back"
+				quit = true
+			else
+				invalid_input
+			end
+		end
+	end
 end

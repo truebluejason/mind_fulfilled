@@ -27,10 +27,10 @@ class Meditation < BaseScreen
 			line
 			pretty_puts 'Desired Length of Meditation (minutes): '
 			blank
-			action = get_action.to_i
+			action = get_action.to_i # CHANGE TO MINUTES by * 60
 			blank SCREEN_GAP
 			if action > 0
-				@duration = action
+				@duration = action * DURATION_MODIFIER
 				proceed = true
 			else
 				invalid_input
@@ -71,6 +71,7 @@ class Meditation < BaseScreen
 		# Meditation session thread that keeps looping
 		session = Thread.new do
 			# screen for meditation
+			simple_on = @loaded_data['options']['simple'] == 'true'
 			dm = @loaded_data['options']['dm']
 			@distractions = @loaded_data['options']['binding']
 			@distract_counts = [0,0,0,0,0]
@@ -90,10 +91,18 @@ class Meditation < BaseScreen
 				blank SCREEN_GAP
 				line
 				blank
-				title_puts dm
+				if simple_on 
+					blank
+				else 
+					title_puts dm
+				end
 				blank 14
-				pretty_puts "Watch for #{top_distraction} today."
-				pretty_puts "Regained awareness from #{curr_distraction}!"
+				if simple_on
+					blank 2
+				else
+					pretty_puts "Watch for #{top_distraction} today."
+					pretty_puts "Regained awareness from #{curr_distraction}!"
+				end
 				if invalid_flag
 					invalid_input
 					invalid_flag = false
@@ -206,7 +215,7 @@ class Meditation < BaseScreen
 			@loaded_data['data']['streak_refresh'] += 60*60*24
 			@loaded_data['data']['last_used'] = today
 		end
-		last_used_date = today
+		@loaded_data['data']['last_used'] = today
 		# Create a Log item based on the session's details and convert the hash generated to YAML
 		log = Log.new(@duration, @distractions, @distract_counts, @q1, @q2, @q3)
 		@loaded_data['data']['session_info'] << log.to_hash

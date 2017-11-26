@@ -25,13 +25,13 @@ class Stats < BaseScreen
 				logs
 			when "q1"
 				blank SCREEN_GAP
-				display_q 1
+				display_q 'q1'
 			when "q2"
 				blank SCREEN_GAP
-				display_q 2
+				display_q 'q2'
 			when "q3"
 				blank SCREEN_GAP
-				display_q 3
+				display_q 'q3'
 			when "menu"
 				quit = true
 			else
@@ -48,19 +48,46 @@ class Stats < BaseScreen
 		blank
 		contents = @loaded_data['data']['contents']
 		contents.each do |key,value|
-			pretty_puts key + ": " + value.to_s
+			pretty_puts key + ": " + value.to_s + " times"
 		end
-		blank 3
-		pretty_puts 'Type "Back" to return to the main menu.'
+		return_to_prev_page
+	end
+
+	def logs
+		line
+		title_puts "Logs"
+		line
 		blank
-		quit = false
-		until quit do
-			if get_action == "back"
-				quit = true
-			else
-				invalid_input
+		info = @loaded_data['data']['session_info']
+		info.each do |log|
+			line
+			pretty_puts "Date: #{log['date'].strftime("%b %d, %Y - %H:%M:%s")}"
+			pretty_puts "Duration: #{log['duration']} minutes"
+			pretty_puts "Contents:"
+			log['contents'].each do |key,value|
+				pretty_puts "- " + key + ": " + value.to_s + " times"
 			end
+			log['notes'].each do |key,value|
+				pretty_puts key.capitalize + ": " + value
+			end
+			line
 		end
+		return_to_prev_page
+	end
+
+	def display_q q
+		line
+		title_puts q.capitalize
+		line
+		blank
+		info = @loaded_data['data']['session_info']
+		info.each do |log|
+			line
+			pretty_puts "Date: #{log['date'].strftime("%b %d, %Y - %H:%M:%s")}"
+			pretty_puts "Response: #{log['notes'][q]}"
+			line
+		end
+		return_to_prev_page
 	end
 
 	def stats_action invalid_flag
