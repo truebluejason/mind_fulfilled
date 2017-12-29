@@ -1,8 +1,7 @@
-def test
-	File.open('sandboxfile.txt','w') do |f|
-		f.puts "ahh..."
-		f.puts "Second line is here."
+class Jason
+	def text msg
+		puts msg
 	end
 end
-
-test
+jay = Jason.new
+jay.text(name: "yoo")

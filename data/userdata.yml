@@ -1,0 +1,35 @@
+---
+min_meditated: 900
+streak: 0
+options:
+  dm: '"Notice breathe"'
+  simple: 'false'
+  binding:
+  - Ping Pong
+  - Self Evaluation
+  - SAP
+  - Quality of Meditation
+  - MISC
+data:
+  last_used: 2017-12-01 00:00:00.000000000 -08:00
+  streak_refresh: 2017-12-29 00:00:00.000000000 -08:00
+  contents:
+    Ellen: 7
+    Self Evaluation: 7
+    SAP: 2
+    Programming with Ellen: 4
+    MISC: 9
+  session_info:
+  - date: 2017-12-01 22:30:59.926055000 -08:00
+    duration: 900
+    contents:
+      Ellen: 7
+      Self Evaluation: 7
+      SAP: 2
+      Programming with Ellen: 4
+      MISC: 9
+    notes:
+      q1: how well i'm meditating.
+      q2: goes on a tangent, sometimes assumes that even though i noticed, i'll be
+        destracted again  very soon.
+      q3: staring at the screen in the beginning caused my eyes to dry.
